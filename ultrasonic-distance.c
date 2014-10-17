@@ -53,7 +53,7 @@ static int64_t sense_range(int trig, int echo, int timeout) {
         }
     }
     while (1) {
-        if (GPIO_READ(echo) == 1) {
+        if (GPIO_READ(echo) != 0) {
             end = gettime();
             if (end > s) {
                 distance = -1;
