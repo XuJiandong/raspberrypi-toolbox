@@ -24,7 +24,7 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     int64_t end = 0;
     int64_t s = gettime() + ((int64_t)timeout)*1000*1000; // for timed out
     // write trigger 
-    INP_GPIO(trig);
+    // INP_GPIO(trig);
     OUT_GPIO(trig);
 
     // read echo
