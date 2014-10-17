@@ -24,12 +24,6 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     int64_t distance = -1;
     int64_t start = 0;
     int64_t end = 0;
-    // write trigger 
-    // INP_GPIO(trig);
-    OUT_GPIO(trig);
-
-    // read echo
-    INP_GPIO(echo);
 
     GPIO_CLR = 1 << trig;
     // settle
@@ -78,8 +72,15 @@ exit:
 int ud_main(int argc, const char* argv[]) {
     SetProgramPriority(99);
     init_gpio();
+    int trig = 23;
+    int echo = 24;
+    // write trigger 
+    OUT_GPIO(trig);
+    // read echo
+    INP_GPIO(echo);
+    delaym(500);
     while (1) {
-        int64_t d = sense_range(23, 24, DEFAULT_TIMEOUT);
+        int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
         printf("%.1f cm (press ctrl+c to stop)\n", ((double)d)/10);
         delaym(500);
     }
