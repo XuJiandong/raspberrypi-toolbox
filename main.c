@@ -3,7 +3,8 @@
 
 int usage() {
     printf("rpi-toolbox options ...\n");
-    printf("options = ud\n");
+    printf("options = ud|buzzer\n");
+    return -1;
 }
 
 int main(int argc, const char* argv[]) {
@@ -12,6 +13,10 @@ int main(int argc, const char* argv[]) {
     }
     if (strcmp(argv[1], "ud") == 0) {
         return ud_main(argc, argv);
+    } else if (strcmp(argv[1], "buzzer") == 0) {
+        return buzzer_main(argc, argv);
+    } else {
+        return usage();
     }
     return 0;
 }

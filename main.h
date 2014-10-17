@@ -15,6 +15,7 @@ extern void init_gpio(void);
 extern void clean_gpio(void);
 
 extern int ud_main(int argc, const char* argv[]);
+extern int buzzer_main(int argc, const char* argv[]);
 
 static inline void delayn(long ns) {
     struct timespec t = {0};
