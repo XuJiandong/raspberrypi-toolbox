@@ -3,6 +3,7 @@
 
 // note: gpio.h and gpio.c is from
 // https://github.com/Pieter-Jan/PJ_RPI
+// and some bug fixed
 #include <stdio.h>
 
 #include <string.h>
@@ -42,17 +43,17 @@ extern struct bcm2835_peripheral bsc0;	// so use extern!!
 #define OUT_GPIO(g) 	INP_GPIO(g); *(gpio.addr + ((g)/10)) |=  (1<<(((g)%10)*3))
 #define SET_GPIO_ALT(g,a) INP_GPIO(g); *(gpio.addr + (((g)/10))) |= (((a)<=3?(a) + 4:(a)==4?3:2)<<(((g)%10)*3))
 
-#define GPIO_SET 	*(gpio.addr + 7)  // sets   bits which are 1 ignores bits which are 0
-#define GPIO_CLR 	*(gpio.addr + 10) // clears bits which are 1 ignores bits which are 0
+#define GPIO_SET 	(*(gpio.addr + 7)) // sets   bits which are 1 ignores bits which are 0
+#define GPIO_CLR 	(*(gpio.addr + 10)) // clears bits which are 1 ignores bits which are 0
 
-#define GPIO_READ(g) 	*(gpio.addr + 13) &= (1<<(g))
+#define GPIO_READ(g) 	(*(gpio.addr + 13) &= (1<<(g)))
 
 // I2C macros
-#define BSC0_C        	*(bsc0.addr + 0x00)
-#define BSC0_S        	*(bsc0.addr + 0x01)
-#define BSC0_DLEN    	*(bsc0.addr + 0x02)
-#define BSC0_A        	*(bsc0.addr + 0x03)
-#define BSC0_FIFO    	*(bsc0.addr + 0x04)
+#define BSC0_C        	(*(bsc0.addr + 0x00))
+#define BSC0_S        	(*(bsc0.addr + 0x01))
+#define BSC0_DLEN    	(*(bsc0.addr + 0x02))
+#define BSC0_A        	(*(bsc0.addr + 0x03))
+#define BSC0_FIFO    	(*(bsc0.addr + 0x04))
 
 #define BSC_C_I2CEN    	(1 << 15)
 #define BSC_C_INTR    	(1 << 10)

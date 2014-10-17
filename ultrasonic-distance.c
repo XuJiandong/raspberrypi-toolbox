@@ -19,10 +19,11 @@ static int SOUND_SPEED = 343;
 const static int DEFAULT_TIMEOUT = 60;
 
 static int64_t sense_range(int trig, int echo, int timeout) {
+    int64_t s = 0;
+
     int64_t distance = -1;
     int64_t start = 0;
     int64_t end = 0;
-    int64_t s = gettime() + ((int64_t)timeout)*1000*1000; // for timed out
     // write trigger 
     // INP_GPIO(trig);
     OUT_GPIO(trig);
@@ -41,10 +42,13 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     delayu(10);
     GPIO_CLR = 1 << trig;
 
+    // this delay can be larger than timeout
+    s = gettime() + ((int64_t)5000)*1000*1000;
     while (1) {
         if (GPIO_READ(echo) == 0) {
             start = gettime();
             if (start > s) {
+                printf("timed out on reading zero\n");
                 distance = -1;
                 goto exit;
             }
@@ -52,10 +56,12 @@ static int64_t sense_range(int trig, int echo, int timeout) {
             break;
         }
     }
+    s = gettime() + ((int64_t)timeout)*1000*1000; // for timed out
     while (1) {
         if (GPIO_READ(echo) != 0) {
             end = gettime();
             if (end > s) {
+                printf("timed out on reading non-zero\n");
                 distance = -1;
                 goto exit;
             }
