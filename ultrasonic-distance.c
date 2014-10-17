@@ -43,10 +43,10 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     GPIO_CLR = 1 << trig;
 
     // this delay can be larger than timeout
-    s = gettime() + ((int64_t)5000)*1000*1000;
+    s = gettime() + ((int64_t)100)*1000*1000;
     while (1) {
+        start = gettime();
         if (GPIO_READ(echo) == 0) {
-            start = gettime();
             if (start > s) {
                 printf("timed out on reading zero\n");
                 distance = -1;
@@ -58,8 +58,8 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     }
     s = gettime() + ((int64_t)timeout)*1000*1000; // for timed out
     while (1) {
+        end = gettime();
         if (GPIO_READ(echo) != 0) {
-            end = gettime();
             if (end > s) {
                 printf("timed out on reading non-zero\n");
                 distance = -1;
@@ -80,7 +80,7 @@ int ud_main(int argc, const char* argv[]) {
     init_gpio();
     while (1) {
         int64_t d = sense_range(23, 24, DEFAULT_TIMEOUT);
-        printf("%lld mm (press ctrl+c to stop)\n", d);
+        printf("%.1f cm (press ctrl+c to stop)\n", ((double)d)/10);
         delaym(500);
     }
     clean_gpio();
