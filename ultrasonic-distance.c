@@ -69,6 +69,11 @@ exit:
     return distance;
 }
 
+static int usage(void) {
+    printf("./pri-toolbox ud less|more [number in cm]\n");
+    return 0;
+}
+
 int ud_main(int argc, const char* argv[]) {
     SetProgramPriority(99);
     init_gpio();
@@ -79,11 +84,47 @@ int ud_main(int argc, const char* argv[]) {
     // read echo
     INP_GPIO(echo);
     delaym(500);
-    while (1) {
+    if (strcmp(argv[2], "loop") == 0) {
+        while (1) {
+            int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
+            printf("%.1f cm (press ctrl+c to stop)\n", ((double)d)/10);
+            delaym(500);
+        }
+    } else if (strcmp(argv[2], "detect") == 0) {
         int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
-        printf("%.1f cm (press ctrl+c to stop)\n", ((double)d)/10);
-        delaym(500);
+        printf("%.1f cm\n", ((double)d)/10);
+    } else if (strcmp(argv[2], "less") == 0) {
+        if (argc < 4) {
+            printf("specify distance(in cm), e.g. ./rpi-toolbox ud less 10");
+            goto exit;
+        }
+        int distance = atoi(argv[3])*10;
+        while (1) {
+            int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
+            if (d < distance) {
+                printf("detect distance(%lld cm) less than %d cm\n", d/10, distance/10);
+                goto exit;
+            }
+            delaym(200);
+        }
+    } else if (strcmp(argv[2], "more") == 0) {
+        if (argc < 4) {
+            printf("specify distance(in cm), e.g. ./rpi-toolbox ud more 10");
+            goto exit;
+        }
+        int distance = atoi(argv[3])*10;
+        while (1) {
+            int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
+            if (d > distance) {
+                printf("detect distance(%lld cm) more than %d cm\n", d/10, distance/10);
+                goto exit;
+            }
+            delaym(200);
+        }
+    } else {
+        return usage();
     }
+exit:
     clean_gpio();
     return 0;
 }
