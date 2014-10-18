@@ -20,10 +20,10 @@ int util_main(int argc, const char* argv[]) {
         OUT_GPIO(port);
         printf("enabled port for writing %d\n", port);
         if (on) {
-            GPIO_SET = 1 << port;
+            GPIO_WRITE(port, 1);
             printf("turn on port %d\n", port);
         } else {
-            GPIO_CLR = 1 << port;
+            GPIO_WRITE(port, 0);
             printf("turn off port %d\n", port);
         }
     } else {

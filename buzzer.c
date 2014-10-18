@@ -40,13 +40,13 @@ static int s_pin = 4;
 static int64_t s_high = 0;
 inline void high(void) {
     s_high++;
-    GPIO_SET = 1 << s_pin;
+    GPIO_WRITE(s_pin, 1);
 }
  
 static int64_t s_low = 0;
 inline void low(void) {
     s_low++;
-    GPIO_CLR = 1 << s_pin;
+    GPIO_WRITE(s_pin, 0);
 }
  
 static int64_t s_count = 0;

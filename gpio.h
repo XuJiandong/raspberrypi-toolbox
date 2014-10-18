@@ -43,10 +43,20 @@ extern struct bcm2835_peripheral bsc0;	// so use extern!!
 #define OUT_GPIO(g) 	INP_GPIO(g); *(gpio.addr + ((g)/10)) |=  (1<<(((g)%10)*3))
 #define SET_GPIO_ALT(g,a) INP_GPIO(g); *(gpio.addr + (((g)/10))) |= (((a)<=3?(a) + 4:(a)==4?3:2)<<(((g)%10)*3))
 
-#define GPIO_SET 	(*(gpio.addr + 7)) // sets   bits which are 1 ignores bits which are 0
-#define GPIO_CLR 	(*(gpio.addr + 10)) // clears bits which are 1 ignores bits which are 0
+// replaced by GPIO_WRITE
+// #define GPIO_SET 	(*(gpio.addr + 7)) // sets bits which are 1 ignores bits which are 0
+// #define GPIO_CLR 	(*(gpio.addr + 10)) // clears bits which are 1 ignores bits which are 0
 
-#define GPIO_READ(g) 	(*(gpio.addr + 13) &= (1<<(g)))
+// return zeror or non-zero
+#define GPIO_READ(g) 	(*(gpio.addr + 13) & (1<<(g)))
+
+static inline void GPIO_WRITE(g, n) {
+    if (n) {
+        (*(gpio.addr+7))  = (1 << g);
+    } else {
+        (*(gpio.addr+10)) = (1 << g);
+    }
+}
 
 // I2C macros
 #define BSC0_C        	(*(bsc0.addr + 0x00))

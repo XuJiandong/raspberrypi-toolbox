@@ -25,16 +25,16 @@ static int64_t sense_range(int trig, int echo, int timeout) {
     int64_t start = 0;
     int64_t end = 0;
 
-    GPIO_CLR = 1 << trig;
+    GPIO_WRITE(trig, 0);
     // settle
     // we suggest to use over 60ms
     // measurement cycle, in order to prevent trigger signal to the echo signal. 
     delaym(DEFAULT_TIMEOUT);
 
     // give a pulse, at lease 10 us
-    GPIO_SET = 1 << trig;
+    GPIO_WRITE(trig, 1);
     delayu(10);
-    GPIO_CLR = 1 << trig;
+    GPIO_WRITE(trig, 0);
 
     // this delay can be larger than timeout
     s = gettime() + ((int64_t)100)*1000*1000;
