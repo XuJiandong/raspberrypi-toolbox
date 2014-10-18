@@ -14,6 +14,12 @@
 extern void init_gpio(void);
 extern void clean_gpio(void);
 
+extern void init_i2c(int n);
+extern void clean_i2c(void);
+extern void i2c_set_addr(int n);
+extern int i2c_get_file(void);
+
+
 extern int ud_main(int argc, const char* argv[]);
 extern int buzzer_main(int argc, const char* argv[]);
 extern int util_main(int argc, const char* argv[]);

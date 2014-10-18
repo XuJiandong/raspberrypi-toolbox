@@ -1,5 +1,6 @@
 #include "gpio.h"
 #include "main.h"
+#include <linux/i2c-dev.h>
 
 int usage() {
     printf("rpi-toolbox options ...\n");
@@ -34,4 +35,31 @@ void init_gpio(void) {
 
 void clean_gpio(void) {
     unmap_peripheral(&gpio);
+}
+
+static int s_file = 0;
+
+void init_i2c(int n) {
+  char fn[32] = {0};
+  snprintf(fn, sizeof(fn)-1, "/dev/i2c-%d", n);
+  s_file = open(fn, O_RDWR);
+  if (s_file < 0) {
+      fprintf(stderr, "can't open %s, not root or number number?\n", fn);
+      exit(1);
+  }
+}
+
+void i2c_set_addr(int addr) {
+    if (ioctl(s_file, I2C_SLAVE, addr) < 0) {
+        fprintf(stderr, "invalid address?\n");
+        exit(1);
+    }
+}
+
+int i2c_get_file(void) {
+    return s_file;
+}
+
+void clean_i2c(void) {
+    close(s_file);
 }
