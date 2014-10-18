@@ -75,7 +75,7 @@ static int usage(void) {
 }
 
 int ud_main(int argc, const char* argv[]) {
-    SetProgramPriority(99);
+    set_program_priority(99);
     init_gpio();
     int trig = 23;
     int echo = 24;

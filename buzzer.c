@@ -72,7 +72,7 @@ void playSound(int fre, int elapsed) {
 }
  
 int buzzer_main(int argc, const char* argv[]) {
-    if(map_peripheral(&gpio) == -1) {
+    if(map_peripheral(&g_gpio) == -1) {
         printf("Failed to map the physical GPIO registers into the virtual memory space.\n");
         return -1;
     }

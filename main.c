@@ -27,14 +27,14 @@ int main(int argc, const char* argv[]) {
 
 
 void init_gpio(void) {
-    if(map_peripheral(&gpio) == -1) {
+    if(map_peripheral(&g_gpio) == -1) {
         printf("Failed to map the physical GPIO registers into the virtual memory space.\n");
         exit(-1);
     }
 }
 
 void clean_gpio(void) {
-    unmap_peripheral(&gpio);
+    unmap_peripheral(&g_gpio);
 }
 
 static int s_file = 0;
