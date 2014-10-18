@@ -13,10 +13,10 @@ int util_main(int argc, const char* argv[]) {
         return usage();
     }
     init_gpio();
-    int port = atoi(argv[4]);
-    int on = atoi(argv[5]);
+    int port = atoi(argv[3]);
+    int on = atoi(argv[4]);
 
-    if (strcmp(argv[3], "write") == 0) {
+    if (strcmp(argv[2], "write") == 0) {
         OUT_GPIO(port);
         printf("enabled port for writing %d\n", port);
         if (on) {
