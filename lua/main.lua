@@ -3,6 +3,7 @@ local rt = ffi.load("librpi-toolbox.so")
 
 
 ffi.cdef([[
+// user defined
 extern void init_gpio(void);
 extern void clean_gpio(void);
 extern void enable_gpio_read(int port);
@@ -19,6 +20,9 @@ extern int i2c_get_file(void);
 extern void bmp180_init(void);
 extern int bmp180_get_t(void);
 extern int bmp180_get_p(void);
+
+extern void delaym(long ms);
+
 ]])
 
 function main(...)
@@ -27,3 +31,12 @@ function main(...)
 end
 
 main(...)
+
+function testGpio()
+    rt.init_gpio()
+    rt.enable_gpio_write(18)
+    rt.write_gpio(18, 1)
+    rt.delaym(1000)
+    rt.write_gpio(18, 0)
+end
+
