@@ -3,6 +3,7 @@
 // modified from 
 // https://android.googlesource.com/kernel/msm.git/+/eaf36994a3992b8f918c18e4f7411e8b2320a35f/drivers/input/misc/bmp180.c
 #include "bmp180.h"
+#include "main.h"
 // aptitude install i2c-tools libi2c-dev 
 #include <linux/i2c-dev.h>
 #include <unistd.h>
@@ -11,6 +12,7 @@
 
 
 #define be16_to_cpu(x) be16toh(x)
+#define be32_to_cpu(x) be32toh(x)
 
 #define BMP180_CHIP_ID                  0x55
 #define BMP180_CALIBRATION_DATA_START   0xAA
@@ -46,15 +48,13 @@ struct bmp180_data {
 	u32 raw_temperature;
 	u32 raw_pressure;
 	unsigned char oversampling_setting;
-	u32 last_temp_measurement;
 	s32 b6; /* calculated temperature correction coefficient */
 	struct input_dev *ip_dev;
 	unsigned long delay_jiffies;
 	struct bmp180_platform_data *pdata;
-	bool power;
 };
 
-static struct bmp180_data g_data;
+static struct bmp180_data g_data = {0};
 
 static inline s32 bmp180_read_calibration_data(struct bmp180_data* data)
 {
@@ -109,7 +109,6 @@ static inline s32 bmp180_update_raw_temperature(struct bmp180_data *data)
         goto exit;
     }
     data->raw_temperature = be16_to_cpu(tmp);
-    data->last_temp_measurement = 0;
     status = 0;   /* everything ok, return 0 */
 
 exit:
@@ -226,11 +225,46 @@ exit:
     return status;
 }
 
-bool bmp180_init(void) {
-    // TODO:
-    //bmp180_probe
-    if (bmp180_read_calibration_data(&g_data) != 0) {
-        fprintf(stderr, "error, bmP180_init() failed\n");
+void bmp180_init(void) {
+    int n = i2c_get_file();
+    if (n == 0) {
+        // TODO:
+        init_i2c(1);
     }
+    // TODO:
+    // get by sudo i2cdetect -y 1
+    i2c_set_addr(0x77);
+    n = i2c_get_file();
+    unsigned char version = i2c_smbus_read_byte_data(n, BMP180_CHIP_ID_REG);
+    if (version != BMP180_CHIP_ID) {
+        fprintf(stderr, "BMP180: wanted chip id 0x%X, "
+                "found chip id 0x%X on client i2c addr 0x%X\n",
+                BMP180_CHIP_ID, version, BMP180_CHIP_ID_REG);
+        exit(-1);
+    }
+    g_data.oversampling_setting = BMP180_STANDARD;
+    g_data.client = n;
+    if (bmp180_read_calibration_data(&g_data) != 0) {
+        fprintf(stderr, "error, bmp180_init() failed\n");
+    }
+}
+
+
+int bmp180_get_t(void) {
+    int t = -1000;
+    int s = bmp180_get_temperature(&g_data, &t);
+    if (s != 0) {
+        fprintf(stderr, "failed to get temperature\n");
+    }
+    return t;
+}
+
+int bmp180_get_p(void) {
+    int p = -1000;
+    int s = bmp180_get_pressure(&g_data, &p);
+    if (s != 0) {
+        fprintf(stderr, "failed to get pressure\n");
+    }
+    return p;
 }
 

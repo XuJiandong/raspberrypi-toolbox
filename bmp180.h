@@ -7,4 +7,10 @@
 #define BMP180_STANDARD              (1)
 #define BMP180_ULTRA_LOW_POWER       (0)
 
+extern void bmp180_init(void);
+// temperature
+extern int bmp180_get_t(void);
+// pressure
+extern int bmp180_get_p(void);
+
 #endif /* LINUX_BMP180_MODULE_H */
