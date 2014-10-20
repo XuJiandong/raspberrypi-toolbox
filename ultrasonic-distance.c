@@ -1,5 +1,4 @@
 #include "main.h"
-#include "gpio.h"
 
 static int SOUND_SPEED = 343;
 
@@ -18,7 +17,7 @@ static int SOUND_SPEED = 343;
 // make it same as settle time
 const static int DEFAULT_TIMEOUT = 60;
 
-static int64_t sense_range(int trig, int echo, int timeout) {
+int64_t sense_range(int trig, int echo, int timeout) {
     int64_t s = 0;
 
     int64_t distance = -1;

@@ -1,7 +1,4 @@
-
 #include "main.h"
-#include "gpio.h"
-
 
 static int usage() {
     printf("./rpi-toolbox util read|write [port] [0|1]");
