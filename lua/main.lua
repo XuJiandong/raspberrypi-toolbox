@@ -14,10 +14,16 @@ extern void init_i2c(int n);
 extern void clean_i2c(void);
 extern void i2c_set_addr(int n);
 extern int i2c_get_file(void);
+
+
+extern void bmp180_init(void);
+extern int bmp180_get_t(void);
+extern int bmp180_get_p(void);
 ]])
 
 function main(...)
-    rt.init_gpio()
-    rt.clean_gpio()
+    rt.bmp180_init()
+    print(string.format("t = %f, p = %d", rt.bmp180_get_t()/10, rt.bmp180_get_p()))
 end
+
 main(...)
