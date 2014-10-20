@@ -13,6 +13,11 @@
 
 extern void init_gpio(void);
 extern void clean_gpio(void);
+// can be used by luajit ffi
+extern void enable_gpio_read(int port);
+extern void enable_gpio_write(int port);
+extern void write_gpio(int port, int n);
+extern int read_gpio(int port);
 
 extern void init_i2c(int n);
 extern void clean_i2c(void);
@@ -36,11 +41,7 @@ static inline void delayu(long us) {
     nanosleep(&t, NULL);
 }
 
-static inline void delaym(long ms) {
-    struct timespec t = {0};
-    t.tv_nsec = ms*1000*1000;
-    nanosleep(&t, NULL);
-}
+extern void delaym(long ms);
 
 static inline int64_t gettime(void) {
     struct timespec t = {0};

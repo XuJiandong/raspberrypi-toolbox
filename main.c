@@ -24,7 +24,11 @@ int main(int argc, const char* argv[]) {
     return 0;
 }
 
-
+void delaym(long ms) {
+    struct timespec t = {0};
+    t.tv_nsec = ms*1000*1000;
+    nanosleep(&t, NULL);
+}
 
 void init_gpio(void) {
     if(map_peripheral(&g_gpio) == -1) {
@@ -63,3 +67,20 @@ int i2c_get_file(void) {
 void clean_i2c(void) {
     close(s_file);
 }
+
+void enable_gpio_read(int port) {
+    INP_GPIO(port);
+}
+
+void enable_gpio_write(int port) {
+    OUT_GPIO(port);
+}
+
+void write_gpio(int port, int n) {
+    GPIO_WRITE(port, n);
+}
+
+int read_gpio(int port) {
+    return GPIO_READ(port) ? 1 : 0;
+}
+
