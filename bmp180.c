@@ -5,8 +5,10 @@
 #include "bmp180.h"
 // aptitude install i2c-tools libi2c-dev 
 #include <linux/i2c-dev.h>
-#include "stdlib.h"
-#include "stdio.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 
 #define be16_to_cpu(x) be16toh(x)
 
@@ -94,8 +96,7 @@ static inline s32 bmp180_update_raw_temperature(struct bmp180_data *data)
         fprintf(stderr, "Error while requesting temperature measurement.\n");
         goto exit;
     }
-    // TODO:
-    // msleep(BMP180_TEMP_CONVERSION_TIME);
+    usleep(BMP180_TEMP_CONVERSION_TIME*1000);
 
     status = i2c_smbus_read_i2c_block_data(data->client,
                     BMP180_CONVERSION_REGISTER_MSB,
@@ -151,8 +152,7 @@ static inline s32 bmp180_update_raw_pressure(struct bmp180_data *data)
     }
 
     /* wait for the end of conversion */
-    // TODO
-    // msleep(2+(3 << data->oversampling_setting));
+    usleep((2+(3 << data->oversampling_setting))*1000);
 
     /* copy data into a u32 (4 bytes), but skip the first byte. */
     status = i2c_smbus_read_i2c_block_data(data->client,
@@ -227,6 +227,8 @@ exit:
 }
 
 bool bmp180_init(void) {
+    // TODO:
+    //bmp180_probe
     if (bmp180_read_calibration_data(&g_data) != 0) {
         fprintf(stderr, "error, bmP180_init() failed\n");
     }
