@@ -268,3 +268,9 @@ int bmp180_get_p(void) {
     return p;
 }
 
+int bmp180_main(int argc, const char* argv[]) {
+    bmp180_init();
+    double t = bmp180_get_t();
+    printf("get temp = %.1f, pressure = %d\n", t/10, bmp180_get_p());
+    return 0;
+}

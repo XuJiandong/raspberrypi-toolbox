@@ -1,5 +1,6 @@
 #include <linux/i2c-dev.h>
 #include "main.h"
+#include "bmp180.h"
 
 struct bcm2835_peripheral g_gpio = {GPIO_BASE};
 
@@ -39,7 +40,7 @@ int set_program_priority(int priorityLevel) {
 
 int usage() {
     printf("rpi-toolbox options ...\n");
-    printf("options = util|ud|buzzer\n");
+    printf("options = util|ud|buzzer|bmp180\n");
     return -1;
 }
 
@@ -53,6 +54,8 @@ int main(int argc, const char* argv[]) {
         return buzzer_main(argc, argv);
     } else if (strcmp(argv[1], "util") == 0) {
         return util_main(argc, argv);
+    } else if (strcmp(argv[1], "bmp180") == 0) {
+        return bmp180_main(argc, argv);
     } else {
         return usage();
     }

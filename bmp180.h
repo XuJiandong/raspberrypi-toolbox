@@ -7,6 +7,8 @@
 #define BMP180_STANDARD              (1)
 #define BMP180_ULTRA_LOW_POWER       (0)
 
+int bmp180_main(int argc, const char* argv[]);
+
 extern void bmp180_init(void);
 // temperature
 extern int bmp180_get_t(void);
