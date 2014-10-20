@@ -3,8 +3,12 @@
 // modified from 
 // https://android.googlesource.com/kernel/msm.git/+/eaf36994a3992b8f918c18e4f7411e8b2320a35f/drivers/input/misc/bmp180.c
 #include "bmp180.h"
+// aptitude install i2c-tools libi2c-dev 
+#include <linux/i2c-dev.h>
 #include "stdlib.h"
 #include "stdio.h"
+
+#define be16_to_cpu(x) be16toh(x)
 
 #define BMP180_CHIP_ID                  0x55
 #define BMP180_CALIBRATION_DATA_START   0xAA
@@ -35,7 +39,7 @@ struct bmp180_calibration_data {
 };
 
 struct bmp180_data {
-	struct i2c_client *client;
+	int client;
 	struct bmp180_calibration_data calibration;
 	u32 raw_temperature;
 	u32 raw_pressure;
@@ -47,6 +51,36 @@ struct bmp180_data {
 	struct bmp180_platform_data *pdata;
 	bool power;
 };
+
+static struct bmp180_data g_data;
+
+static inline s32 bmp180_read_calibration_data(struct bmp180_data* data)
+{
+    u16 tmp[BMP180_CALIBRATION_DATA_LENGTH];
+    struct bmp180_calibration_data *cali = &(data->calibration);
+    s32 status = i2c_smbus_read_i2c_block_data(data->client,
+                BMP180_CALIBRATION_DATA_START,
+                sizeof(tmp),
+                (u8 *)tmp);
+    if (status < 0)
+        return status;
+
+    if (status != sizeof(tmp))
+        return -1;
+
+    cali->AC1 = be16_to_cpu(tmp[0]);
+    cali->AC2 = be16_to_cpu(tmp[1]);
+    cali->AC3 = be16_to_cpu(tmp[2]);
+    cali->AC4 = be16_to_cpu(tmp[3]);
+    cali->AC5 = be16_to_cpu(tmp[4]);
+    cali->AC6 = be16_to_cpu(tmp[5]);
+    cali->B1 = be16_to_cpu(tmp[6]);
+    cali->B2 = be16_to_cpu(tmp[7]);
+    cali->MB = be16_to_cpu(tmp[8]);
+    cali->MC = be16_to_cpu(tmp[9]);
+    cali->MD = be16_to_cpu(tmp[10]);
+    return 0;
+}
 
 
 static inline s32 bmp180_update_raw_temperature(struct bmp180_data *data)
@@ -193,4 +227,8 @@ exit:
 }
 
 bool bmp180_init(void) {
+    if (bmp180_read_calibration_data(&g_data) != 0) {
+        fprintf(stderr, "error, bmP180_init() failed\n");
+    }
 }
+
