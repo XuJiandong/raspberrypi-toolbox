@@ -62,12 +62,6 @@ int main(int argc, const char* argv[]) {
     return 0;
 }
 
-void delaym(long ms) {
-    struct timespec t = {0};
-    t.tv_nsec = ms*1000*1000;
-    nanosleep(&t, NULL);
-}
-
 void init_gpio(void) {
     if(map_peripheral(&g_gpio) == -1) {
         printf("Failed to map the physical GPIO registers into the virtual memory space.\n");

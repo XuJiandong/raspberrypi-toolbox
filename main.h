@@ -64,20 +64,6 @@ extern int ud_main(int argc, const char* argv[]);
 extern int buzzer_main(int argc, const char* argv[]);
 extern int util_main(int argc, const char* argv[]);
 
-static inline void delayn(long ns) {
-    struct timespec t = {0};
-    t.tv_nsec = ns;
-    nanosleep(&t, NULL);
-}
-
-static inline void delayu(long us) {
-    struct timespec t = {0};
-    t.tv_nsec = us*1000;
-    nanosleep(&t, NULL);
-}
-
-extern void delaym(long ms);
-
 static inline int64_t gettime(void) {
     struct timespec t = {0};
     clock_gettime(CLOCK_MONOTONIC, &t);

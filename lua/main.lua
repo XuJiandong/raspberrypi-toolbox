@@ -20,9 +20,8 @@ extern int i2c_get_file(void);
 extern void bmp180_init(void);
 extern int bmp180_get_t(void);
 extern int bmp180_get_p(void);
-
-extern void delaym(long ms);
-
+// std
+int usleep(unsigned int usec);
 ]])
 
 function main(...)
@@ -30,13 +29,18 @@ function main(...)
     print(string.format("t = %f, p = %d", rt.bmp180_get_t()/10, rt.bmp180_get_p()))
 end
 
-main(...)
-
 function testGpio()
     rt.init_gpio()
     rt.enable_gpio_write(18)
     rt.write_gpio(18, 1)
-    rt.delaym(1000)
+    ffi.C.usleep(1000*1000);
     rt.write_gpio(18, 0)
 end
+
+function testing()
+    ffi.C.usleep(1000*1000)
+    print("done")
+end
+
+testing()
 

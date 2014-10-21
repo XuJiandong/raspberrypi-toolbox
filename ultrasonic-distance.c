@@ -28,11 +28,11 @@ int64_t sense_range(int trig, int echo, int timeout) {
     // settle
     // we suggest to use over 60ms
     // measurement cycle, in order to prevent trigger signal to the echo signal. 
-    delaym(DEFAULT_TIMEOUT);
+    usleep(DEFAULT_TIMEOUT*1000);
 
     // give a pulse, at lease 10 us
     GPIO_WRITE(trig, 1);
-    delayu(10);
+    usleep(10);
     GPIO_WRITE(trig, 0);
 
     // this delay can be larger than timeout
@@ -82,12 +82,12 @@ int ud_main(int argc, const char* argv[]) {
     OUT_GPIO(trig);
     // read echo
     INP_GPIO(echo);
-    delaym(500);
+    usleep(500*1000);
     if (strcmp(argv[2], "loop") == 0) {
         while (1) {
             int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
             printf("%.1f cm (press ctrl+c to stop)\n", ((double)d)/10);
-            delaym(500);
+            usleep(500*1000);
         }
     } else if (strcmp(argv[2], "detect") == 0) {
         int64_t d = sense_range(trig, echo, DEFAULT_TIMEOUT);
@@ -104,7 +104,7 @@ int ud_main(int argc, const char* argv[]) {
                 printf("detect distance(%lld cm) less than %d cm\n", d/10, distance/10);
                 goto exit;
             }
-            delaym(200);
+            usleep(200*1000);
         }
     } else if (strcmp(argv[2], "more") == 0) {
         if (argc < 4) {
@@ -118,7 +118,7 @@ int ud_main(int argc, const char* argv[]) {
                 printf("detect distance(%lld cm) more than %d cm\n", d/10, distance/10);
                 goto exit;
             }
-            delaym(200);
+            usleep(200*1000);
         }
     } else {
         return usage();

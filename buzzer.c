@@ -57,11 +57,13 @@ void playSound(int fre, int elapsed) {
  
     s_count++;
     period = 1000000000L/fre;
+    struct timespec t = {0};
+    t.tv_nsec = period/2;
     for (;;) {
         low();
-        delayn(period/2);
+        nanosleep(&t, NULL);
         high();
-        delayn(period/2);
+        nanosleep(&t, NULL);
         e += period;
         if (e > d) {
             break;
@@ -88,7 +90,7 @@ int buzzer_main(int argc, const char* argv[]) {
         if (r == 2) {
             if (fre < 20) {
                 // no sound
-                delaym(elapsed);
+                usleep(elapsed*1000);
             } else {
                 playSound(fre, elapsed);
             }
