@@ -32,7 +32,7 @@ extern struct bcm2835_peripheral g_gpio;
 #define INP_GPIO(g) 	*(g_gpio.addr + ((g)/10)) &= ~(7<<(((g)%10)*3))
 #define OUT_GPIO(g) 	INP_GPIO(g); *(g_gpio.addr + ((g)/10)) |=  (1<<(((g)%10)*3))
 #define GPIO_READ(g) 	(*(g_gpio.addr + 13) & (1<<(g)))
-static inline void GPIO_WRITE(g, n) {
+static inline void GPIO_WRITE(int g, int n) {
     if (n) {
         (*(g_gpio.addr+7))  = (1 << g);
     } else {
@@ -65,7 +65,7 @@ extern int buzzer_main(int argc, const char* argv[]);
 extern int util_main(int argc, const char* argv[]);
 
 static inline int64_t gettime(void) {
-    struct timespec t = {0};
+    struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
     int64_t n = t.tv_sec;
     n = n*1000*1000*1000 + t.tv_nsec;

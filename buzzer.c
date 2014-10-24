@@ -36,13 +36,13 @@ EOF
 static int s_pin = 4;
  
 static int64_t s_high = 0;
-inline void high(void) {
+inline static void high(void) {
     s_high++;
     GPIO_WRITE(s_pin, 1);
 }
  
 static int64_t s_low = 0;
-inline void low(void) {
+inline static void low(void) {
     s_low++;
     GPIO_WRITE(s_pin, 0);
 }
