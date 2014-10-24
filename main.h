@@ -12,7 +12,7 @@
 #include <inttypes.h>
 #include <sys/mman.h>
 #include <sys/types.h>
-
+#include <linux/i2c-dev.h>
 // some code is from 
 // https://github.com/Pieter-Jan/PJ_RPI
 #define BCM2708_PERI_BASE       0x20000000

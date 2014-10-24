@@ -1,4 +1,3 @@
-#include <linux/i2c-dev.h>
 #include "main.h"
 #include "bmp180.h"
 
