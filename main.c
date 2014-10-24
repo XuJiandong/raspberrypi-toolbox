@@ -39,7 +39,7 @@ int set_program_priority(int priorityLevel) {
 
 int usage() {
     printf("rpi-toolbox options ...\n");
-    printf("options = util|ud|buzzer|bmp180\n");
+    printf("options = util|ud|buzzer|bmp180|lcd1602\n");
     return -1;
 }
 
@@ -55,6 +55,8 @@ int main(int argc, const char* argv[]) {
         return util_main(argc, argv);
     } else if (strcmp(argv[1], "bmp180") == 0) {
         return bmp180_main(argc, argv);
+    } else if (strcmp(argv[1], "lcd1602") == 0) {
+        return lcd1602_main(argc, argv);
     } else {
         return usage();
     }

@@ -44,31 +44,31 @@
 #define LCD_BACKLIGHT  0x08
 #define LCD_NOBACKLIGHT  0x00
 
-#define EN 0b00000100 // Enable bit
-#define RW 0b00000010 // Read/Write bit
-#define RS 0b00000001 // Register select bit
+#define EN 4 // Enable bit
+#define RW 2 // Read/Write bit
+#define RS 1 // Register select bit
 
 
 inline static void WRITE(uint8_t data) {
     int file = i2c_get_file();
     i2c_smbus_write_byte(file, data);
-    usleep(100);
+    usleep(200);
 }
 
 static void lcd_write_four_bits(uint8_t data) {
     WRITE(data | LCD_BACKLIGHT);
     WRITE(data | EN | LCD_BACKLIGHT);
-    usleep(1000*500);
+    usleep(600);
     WRITE(((data & ~EN) | LCD_BACKLIGHT));
-    usleep(1000*100);
+    usleep(200);
 }
 
-static void lcd_write(int d) {
+static void lcd_write(uint8_t d) {
     lcd_write_four_bits(d & 0xF);
     lcd_write_four_bits((d << 4) & 0xF0);
 }
 
-static void lcd_write_cmd(int cmd, int mode) {
+static void lcd_write_cmd(uint8_t cmd, uint8_t mode) {
     lcd_write_four_bits(mode | (cmd & 0xF0));
     lcd_write_four_bits(mode | ((cmd << 4) & 0xF0));
 }
@@ -77,6 +77,7 @@ void lcd_init(struct lcd1602* lcd) {
     lcd->addr = ADDRESS;
     init_i2c(1);
     i2c_set_addr(lcd->addr);
+    usleep(1000*1000);
 
     lcd_write(0x03);
     lcd_write(0x03);
@@ -101,6 +102,7 @@ void lcd_display(struct lcd1602* lcd, const char* str, int line) {
      } else if (line == 4) {
          lcd_write(0xD4);
      }
+     usleep(37);
      int len = strlen(str);
      int i = 0;
      for (i = 0; i < len; i++ ) {
@@ -112,18 +114,19 @@ void lcd_display(struct lcd1602* lcd, const char* str, int line) {
 void lcd_clear(struct lcd1602* lcd) {
     i2c_set_addr(lcd->addr);
     lcd_write(LCD_CLEARDISPLAY);
+    usleep(1520); // 1.52 ms
     lcd_write(LCD_RETURNHOME);
+    usleep(1520); // 1.52 ms
 }
 
 static struct lcd1602 g_lcd;
 
 int lcd1602_main(int argc, const char* argv[]) {
+    printf("lcd1602_main()\n");
     lcd_init(&g_lcd);
     lcd_clear(&g_lcd);
-
-    lcd_display(&g_lcd, "hello, world", 1);
-    lcd_display(&g_lcd, "hello, world", 2);
-    lcd_display(&g_lcd, "hello, world", 3);
-    lcd_display(&g_lcd, "hello, world", 4);
+    lcd_display(&g_lcd, "hello 1", 1);
+    lcd_display(&g_lcd, "hello 2", 2);
+    lcd_display(&g_lcd, "hello 2", 3);
+    lcd_display(&g_lcd, "hello 2", 4);
 }
-

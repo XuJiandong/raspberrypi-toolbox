@@ -63,6 +63,8 @@ extern int i2c_get_file(void);
 extern int ud_main(int argc, const char* argv[]);
 extern int buzzer_main(int argc, const char* argv[]);
 extern int util_main(int argc, const char* argv[]);
+extern int lcd1602_main(int argc, const char* argv[]);
+
 
 static inline int64_t gettime(void) {
     struct timespec t;
