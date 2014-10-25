@@ -1,6 +1,9 @@
 #include "main.h"
 #include "lcd1602.h"
 
+#define WAIT_EXECUTION() usleep(37)
+
+
 #define ADDRESS  0x27
 
 #define LCD_CLEARDISPLAY  0x01
@@ -55,15 +58,14 @@ inline static void WRITE(uint8_t data) {
 #ifdef DEBUG_LCD
     printf("writing %d\n", data);
 #endif
-    usleep(200);
+    WAIT_EXECUTION();
 }
 
 static void lcd_write_four_bits(uint8_t data) {
     WRITE(data);
     WRITE(data | EN);
-    usleep(600);
+    usleep(100);
     WRITE(data & ~EN);
-    usleep(200);
 }
 
 static void lcd_write(uint8_t d) {
@@ -80,8 +82,6 @@ void lcd_init(struct lcd1602* lcd) {
     lcd->addr = ADDRESS;
     init_i2c(1);
     i2c_set_addr(lcd->addr);
-    usleep(1000*1000);
-
     lcd_write(0x03);
     lcd_write(0x03);
     lcd_write(0x03);
@@ -90,13 +90,12 @@ void lcd_init(struct lcd1602* lcd) {
     lcd_write(LCD_FUNCTIONSET | LCD_2LINE | LCD_5x8DOTS | LCD_4BITMODE);
     lcd_write(LCD_DISPLAYCONTROL | LCD_DISPLAYON);
     lcd_write(LCD_CLEARDISPLAY);
+    usleep(1520);
     lcd_write(LCD_ENTRYMODESET | LCD_ENTRYLEFT);
-    usleep(1000*200);
 }
 
 void lcd_display(struct lcd1602* lcd, const char* str, int line) {
     i2c_set_addr(lcd->addr);
-    usleep(100);
     if (line == 1) {
         lcd_write(0x80);
     } else if (line == 2) {
@@ -106,13 +105,11 @@ void lcd_display(struct lcd1602* lcd, const char* str, int line) {
     } else if (line == 4) {
         lcd_write(0xD4);
     }
-    usleep(37);
     int len = strlen(str);
     int i = 0;
     for (i = 0; i < len; i++ ) {
         lcd_write_cmd(str[i], RS);
     }
-
 }
 
 void lcd_clear(struct lcd1602* lcd) {
