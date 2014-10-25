@@ -97,6 +97,10 @@ int i2c_get_file(void) {
     return s_file;
 }
 
+void i2c_write_byte(uint8_t v) {
+    i2c_smbus_write_byte(s_file, v);
+}
+
 void clean_i2c(void) {
     close(s_file);
 }

@@ -41,7 +41,7 @@
 #define LCD_5x8DOTS  0x00
 
 // flags for backlight control
-#define LCD_BACKLIGHT  0x08
+#define LCD_BACKLIGHT  0x08 // NA
 #define LCD_NOBACKLIGHT  0x00
 
 #define EN 4 // Enable bit
@@ -56,10 +56,10 @@ inline static void WRITE(uint8_t data) {
 }
 
 static void lcd_write_four_bits(uint8_t data) {
-    WRITE(data | LCD_BACKLIGHT);
-    WRITE(data | EN | LCD_BACKLIGHT);
+    WRITE(data);
+    WRITE(data | EN);
     usleep(600);
-    WRITE(((data & ~EN) | LCD_BACKLIGHT));
+    WRITE(data & ~EN);
     usleep(200);
 }
 
@@ -93,21 +93,22 @@ void lcd_init(struct lcd1602* lcd) {
 
 void lcd_display(struct lcd1602* lcd, const char* str, int line) {
     i2c_set_addr(lcd->addr);
-     if (line == 1) {
-         lcd_write(0x80);
-     } else if (line == 2) {
-         lcd_write(0xC0);
-     } else if (line == 3) {
-         lcd_write(0x94);
-     } else if (line == 4) {
-         lcd_write(0xD4);
-     }
-     usleep(37);
-     int len = strlen(str);
-     int i = 0;
-     for (i = 0; i < len; i++ ) {
-         lcd_write_cmd(str[i], RS);
-     }
+    usleep(100);
+    if (line == 1) {
+        lcd_write(0x80);
+    } else if (line == 2) {
+        lcd_write(0xC0);
+    } else if (line == 3) {
+        lcd_write(0x94);
+    } else if (line == 4) {
+        lcd_write(0xD4);
+    }
+    usleep(37);
+    int len = strlen(str);
+    int i = 0;
+    for (i = 0; i < len; i++ ) {
+        lcd_write_cmd(str[i], RS);
+    }
 
 }
 

@@ -15,11 +15,21 @@ extern void init_i2c(int n);
 extern void clean_i2c(void);
 extern void i2c_set_addr(int n);
 extern int i2c_get_file(void);
+extern void i2c_write_byte(uint8_t);
 
 
 extern void bmp180_init(void);
 extern int bmp180_get_t(void);
 extern int bmp180_get_p(void);
+
+struct lcd1602 {
+    int addr;
+};
+
+extern void lcd_init(struct lcd1602*);
+extern void lcd_display(struct lcd1602*, const char* str, int line);
+extern void lcd_clear(struct lcd1602*);
+
 // std
 int usleep(unsigned int usec);
 ]])
@@ -42,5 +52,31 @@ function testing()
     print("done")
 end
 
-testing()
+function testI2c(...)
+    local argv = {...}
+    local v = 1
+    if argv[1] then
+        v = tonumber(argv[1])
+    end
+    rt.init_i2c(1)
+    rt.i2c_set_addr(0x27)
+    print("write " .. tostring(v) .. " to 0x27 on i2c")
+    rt.i2c_write_byte(v)
+end
 
+function testLcd1602(...)
+    local lcd = ffi.new("struct lcd1602[1]")
+    rt.lcd_init(lcd)
+    print("clear screen")
+    rt.lcd_clear(lcd)
+    print("display on line 1")
+    rt.lcd_display(lcd, "hello,world", 1)
+    print("display on line 2")
+    rt.lcd_display(lcd, "-------", 2)
+    print("display on line 3")
+    rt.lcd_display(lcd, "*******", 3)
+end
+
+if ... then
+    testLcd1602(...)
+end

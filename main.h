@@ -58,7 +58,7 @@ extern void init_i2c(int n);
 extern void clean_i2c(void);
 extern void i2c_set_addr(int n);
 extern int i2c_get_file(void);
-
+extern void i2c_write_byte(uint8_t);
 
 extern int ud_main(int argc, const char* argv[]);
 extern int buzzer_main(int argc, const char* argv[]);
