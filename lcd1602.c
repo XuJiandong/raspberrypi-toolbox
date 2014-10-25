@@ -52,6 +52,9 @@
 inline static void WRITE(uint8_t data) {
     int file = i2c_get_file();
     i2c_smbus_write_byte(file, data);
+#ifdef DEBUG_LCD
+    printf("writing %d\n", data);
+#endif
     usleep(200);
 }
 
@@ -64,7 +67,7 @@ static void lcd_write_four_bits(uint8_t data) {
 }
 
 static void lcd_write(uint8_t d) {
-    lcd_write_four_bits(d & 0xF);
+    lcd_write_four_bits(d & 0xF0);
     lcd_write_four_bits((d << 4) & 0xF0);
 }
 
@@ -130,4 +133,5 @@ int lcd1602_main(int argc, const char* argv[]) {
     lcd_display(&g_lcd, "hello 2", 2);
     lcd_display(&g_lcd, "hello 2", 3);
     lcd_display(&g_lcd, "hello 2", 4);
+    return 0;
 }

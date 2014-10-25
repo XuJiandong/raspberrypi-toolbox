@@ -70,11 +70,13 @@ function testLcd1602(...)
     print("clear screen")
     rt.lcd_clear(lcd)
     print("display on line 1")
-    rt.lcd_display(lcd, "hello,world", 1)
+    rt.lcd_display(lcd, "xxxxxxxxxxxxxxxxxxxxxxxxxxxx", 1)
     print("display on line 2")
-    rt.lcd_display(lcd, "-------", 2)
+    rt.lcd_display(lcd, "hello,world 2", 2)
     print("display on line 3")
-    rt.lcd_display(lcd, "*******", 3)
+    rt.lcd_display(lcd, "hello,world 3", 3)
+    print("display on line 4")
+    rt.lcd_display(lcd, "hello,world 4", 4)
 end
 
 if ... then
