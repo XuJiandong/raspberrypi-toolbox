@@ -44,7 +44,7 @@
 #define LCD_5x8DOTS  0x00
 
 // flags for backlight control
-#define LCD_BACKLIGHT  0x08 // NA
+#define LCD_BACKLIGHT  0x08
 #define LCD_NOBACKLIGHT  0x00
 
 #define EN 4 // Enable bit
@@ -66,10 +66,10 @@ inline static void WRITE(uint8_t data) {
 }
 
 static void write_four_bits(uint8_t data) {
-    WRITE(data);
-    WRITE(data | EN);
+    WRITE(data | LCD_BACKLIGHT);
+    WRITE(data | EN | LCD_BACKLIGHT);
     WAIT_EXECUTION(); // actuall less than this
-    WRITE(data & ~EN);
+    WRITE((data & ~EN) | LCD_BACKLIGHT);
 }
 
 void lcd_write_cmd(uint8_t d) {
