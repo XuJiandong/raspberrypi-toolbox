@@ -66,13 +66,15 @@ function testI2c(...)
     rt.i2c_write_byte(v)
 end
 
-function LcdDisplay(str, line)
+
+-- LCD part
+function LcdPrintln(str, line)
     if not str then
-        print("LcdDisplay() error, specify string")
+        print("LcdPrintln() error, specify string")
         return
     end
     if line < 0 or line > 4 then
-        print("LcdDisplay() error, invalid line")
+        print("LcdPrintln() error, invalid line")
         return
     end
     if string.len(str) > 20 then
@@ -87,6 +89,14 @@ function LcdWriteCmd(cmd)
         return 
     end
     rt.lcd_write_cmd(cmd)
+end
+
+function LcdEnableShift(e)
+    local v = 0x06
+    if e then
+        v = v + 1
+    end
+    LcdWriteCmd(v)
 end
 
 function LcdCursor(on, blink)
@@ -108,26 +118,78 @@ function LcdOn(on)
     LcdWriteCmd(v)
 end
 
-function testLcd1602(...)
-    rt.lcd_init()
-    print("clear screen")
-    rt.lcd_clear()
-    LcdDisplay("-----------", 1)
-    LcdDisplay("hello,world, -------------------------------", 2)
-    LcdDisplay("FBI Warning, -------------------------------", 3)
-    LcdDisplay("-----------", 4)
-    msleep(2000)
-    LcdCursor(true, false)
-    msleep(2000)
-    LcdCursor(true, true)
+function LcdBlink(cycle, time)
+    local elapsed = 0
     while true do
-        msleep(1000)
-        LcdOn(false)
-        msleep(1000)
         LcdOn(true)
+        msleep(cycle)
+        LcdOn(false)
+        msleep(500)
+        elapsed = elapsed + cycle + 500
+        if elapsed > time then
+            break
+        end
+    end
+    LcdOn(true)
+end
+
+function LcdOutput(...)
+    rt.lcd_init()
+    rt.lcd_clear()
+    for i, v in ipairs({...}) do
+        if i <= 4 then
+            LcdPrintln(v, i)
+        else
+            break
+        end
     end
 end
 
+function testLcd1602(...)
+    rt.lcd_init()
+    rt.lcd_clear()
+    LcdPrintln("-----------", 1)
+    LcdPrintln("hello,world, -------------------------------", 2)
+    LcdPrintln("FBI Warning, -------------------------------", 3)
+    LcdPrintln("-----------", 4)
+    msleep(2000)
+    LcdCursor(true, false)
+    print("show cursor")
+    msleep(2000)
+    LcdCursor(true, true)
+    print("cursor blink")
+    
+    LcdBlink(2000, 10000)
+
+    local count = 0
+    while true do
+        msleep(1000)
+        io.write(".")
+        io.flush()
+        count = count + 1
+        if count >= 60 then
+            io.write("\n")
+            io.flush()
+            count = 0
+        end
+    end
+end
+
+function usage()
+    print("sudo bash run.sh [lcdtest|lcd]")
+    return 1
+end
+
 if ... then
-    testLcd1602(...)
+    local args = {...}
+    if args[1] == "lcdtest" then
+        testLcd1602(...)
+    elseif args[1] == "lcd" then
+        table.remove(args, 1)
+        LcdOutput(unpack(args))
+    else
+        return usage()
+    end
+else
+    return usage()
 end
