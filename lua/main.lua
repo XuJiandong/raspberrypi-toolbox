@@ -25,10 +25,11 @@ extern int bmp180_get_p(void);
 struct lcd1602 {
     int addr;
 };
-
-extern void lcd_init(struct lcd1602*);
-extern void lcd_display(struct lcd1602*, const char* str, int line);
-extern void lcd_clear(struct lcd1602*);
+extern void lcd_init(void);
+extern void lcd_display(const char* str, int line);
+extern void lcd_clear(void);
+extern void lcd_write_cmd(uint8_t);
+extern void lcd_write_data(uint8_t);
 
 // std
 int usleep(unsigned int usec);
@@ -65,18 +66,17 @@ function testI2c(...)
 end
 
 function testLcd1602(...)
-    local lcd = ffi.new("struct lcd1602[1]")
-    rt.lcd_init(lcd)
+    rt.lcd_init()
     print("clear screen")
-    rt.lcd_clear(lcd)
+    rt.lcd_clear()
     print("display on line 1")
-    rt.lcd_display(lcd, "xxxxxxxxxxxxxxxxxxxxxxxxxxxx", 1)
+    rt.lcd_display("xxxxxxxxxxxxxxxxxxxxxxxxxxxx", 1)
     print("display on line 2")
-    rt.lcd_display(lcd, "hello,world 2", 2)
+    rt.lcd_display("hello,world 2", 2)
     print("display on line 3")
-    rt.lcd_display(lcd, "hello,world 3", 3)
+    rt.lcd_display("hello,world 3", 3)
     print("display on line 4")
-    rt.lcd_display(lcd, "hello,world 4", 4)
+    rt.lcd_display("hello,world 4", 4)
 end
 
 if ... then

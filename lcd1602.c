@@ -51,6 +51,10 @@
 #define RW 2 // Read/Write bit
 #define RS 1 // Register select bit
 
+struct lcd1602 {
+    int addr;
+};
+static struct lcd1602 g_lcd;
 
 inline static void WRITE(uint8_t data) {
     int file = i2c_get_file();
@@ -61,74 +65,75 @@ inline static void WRITE(uint8_t data) {
     WAIT_EXECUTION();
 }
 
-static void lcd_write_four_bits(uint8_t data) {
+static void write_four_bits(uint8_t data) {
     WRITE(data);
     WRITE(data | EN);
-    usleep(100);
+    WAIT_EXECUTION(); // actuall less than this
     WRITE(data & ~EN);
 }
 
-static void lcd_write(uint8_t d) {
-    lcd_write_four_bits(d & 0xF0);
-    lcd_write_four_bits((d << 4) & 0xF0);
+void lcd_write_cmd(uint8_t d) {
+    i2c_set_addr(g_lcd.addr);
+    write_four_bits(d & 0xF0);
+    write_four_bits((d << 4) & 0xF0);
 }
 
-static void lcd_write_cmd(uint8_t cmd, uint8_t mode) {
-    lcd_write_four_bits(mode | (cmd & 0xF0));
-    lcd_write_four_bits(mode | ((cmd << 4) & 0xF0));
+void lcd_write_data(uint8_t cmd) {
+    i2c_set_addr(g_lcd.addr);
+    write_four_bits(RS | (cmd & 0xF0));
+    write_four_bits(RS | ((cmd << 4) & 0xF0));
 }
 
-void lcd_init(struct lcd1602* lcd) {
-    lcd->addr = ADDRESS;
+void lcd_init(void) {
+    g_lcd.addr = ADDRESS;
     init_i2c(1);
-    i2c_set_addr(lcd->addr);
-    lcd_write(0x03);
-    lcd_write(0x03);
-    lcd_write(0x03);
-    lcd_write(0x02);
+    i2c_set_addr(g_lcd.addr);
+    lcd_write_cmd(0x03);
+    lcd_write_cmd(0x03);
+    lcd_write_cmd(0x03);
+    lcd_write_cmd(0x02);
 
-    lcd_write(LCD_FUNCTIONSET | LCD_2LINE | LCD_5x8DOTS | LCD_4BITMODE);
-    lcd_write(LCD_DISPLAYCONTROL | LCD_DISPLAYON);
-    lcd_write(LCD_CLEARDISPLAY);
+    lcd_write_cmd(LCD_FUNCTIONSET | LCD_2LINE | LCD_5x8DOTS | LCD_4BITMODE);
+    lcd_write_cmd(LCD_DISPLAYCONTROL | LCD_DISPLAYON);
+    lcd_write_cmd(LCD_CLEARDISPLAY);
     usleep(1520);
-    lcd_write(LCD_ENTRYMODESET | LCD_ENTRYLEFT);
+    lcd_write_cmd(LCD_ENTRYMODESET | LCD_ENTRYLEFT);
 }
 
-void lcd_display(struct lcd1602* lcd, const char* str, int line) {
-    i2c_set_addr(lcd->addr);
+void lcd_display(const char* str, int line) {
+    i2c_set_addr(g_lcd.addr);
     if (line == 1) {
-        lcd_write(0x80);
+        lcd_write_cmd(0x80);
     } else if (line == 2) {
-        lcd_write(0xC0);
+        lcd_write_cmd(0xC0);
     } else if (line == 3) {
-        lcd_write(0x94);
+        lcd_write_cmd(0x94);
     } else if (line == 4) {
-        lcd_write(0xD4);
+        lcd_write_cmd(0xD4);
     }
     int len = strlen(str);
     int i = 0;
     for (i = 0; i < len; i++ ) {
-        lcd_write_cmd(str[i], RS);
+        lcd_write_data(str[i]);
     }
 }
 
-void lcd_clear(struct lcd1602* lcd) {
-    i2c_set_addr(lcd->addr);
-    lcd_write(LCD_CLEARDISPLAY);
+void lcd_clear(void) {
+    i2c_set_addr(g_lcd.addr);
+    lcd_write_cmd(LCD_CLEARDISPLAY);
     usleep(1520); // 1.52 ms
-    lcd_write(LCD_RETURNHOME);
+    lcd_write_cmd(LCD_RETURNHOME);
     usleep(1520); // 1.52 ms
 }
-
-static struct lcd1602 g_lcd;
 
 int lcd1602_main(int argc, const char* argv[]) {
     printf("lcd1602_main()\n");
-    lcd_init(&g_lcd);
-    lcd_clear(&g_lcd);
-    lcd_display(&g_lcd, "hello 1", 1);
-    lcd_display(&g_lcd, "hello 2", 2);
-    lcd_display(&g_lcd, "hello 2", 3);
-    lcd_display(&g_lcd, "hello 2", 4);
+    lcd_init();
+    lcd_clear();
+    lcd_display("hello 1", 1);
+    lcd_display("hello 2", 2);
+    lcd_display("hello 2", 3);
+    lcd_display("hello 2", 4);
     return 0;
 }
+
