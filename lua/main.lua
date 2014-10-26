@@ -22,9 +22,6 @@ extern void bmp180_init(void);
 extern int bmp180_get_t(void);
 extern int bmp180_get_p(void);
 
-struct lcd1602 {
-    int addr;
-};
 extern void lcd_init(void);
 extern void lcd_display(const char* str, int line);
 extern void lcd_clear(void);
@@ -38,6 +35,10 @@ int usleep(unsigned int usec);
 function main(...)
     rt.bmp180_init()
     print(string.format("t = %f, p = %d", rt.bmp180_get_t()/10, rt.bmp180_get_p()))
+end
+
+function msleep(m)
+    ffi.C.usleep(1000*m)
 end
 
 function testGpio()
@@ -65,18 +66,66 @@ function testI2c(...)
     rt.i2c_write_byte(v)
 end
 
+function LcdDisplay(str, line)
+    if not str then
+        print("LcdDisplay() error, specify string")
+        return
+    end
+    if line < 0 or line > 4 then
+        print("LcdDisplay() error, invalid line")
+        return
+    end
+    if string.len(str) > 20 then
+        str = string.sub(str, 1, 20)
+    end
+    rt.lcd_display(str, line)
+end
+
+function LcdWriteCmd(cmd)
+    if type(cmd) ~= "number" then
+        print("LcdWriteCmd() only accept integer")
+        return 
+    end
+    rt.lcd_write_cmd(cmd)
+end
+
+function LcdCursor(on, blink)
+    local v = 0x08 + 0x04
+    if on then
+        v = v + 2
+    end
+    if blink then
+        v = v + 1
+    end
+    LcdWriteCmd(v)
+end
+
+function LcdOn(on)
+    local v = 0x08
+    if on then
+        v = v + 0x04
+    end
+    LcdWriteCmd(v)
+end
+
 function testLcd1602(...)
     rt.lcd_init()
     print("clear screen")
     rt.lcd_clear()
-    print("display on line 1")
-    rt.lcd_display("-> <- <- -> ... ...", 1)
-    print("display on line 2")
-    rt.lcd_display("hello,world 2", 2)
-    print("display on line 3")
-    rt.lcd_display("hello,world 3", 3)
-    print("display on line 4")
-    rt.lcd_display("hello,world 4", 4)
+    LcdDisplay("-----------", 1)
+    LcdDisplay("hello,world, -------------------------------", 2)
+    LcdDisplay("FBI Warning, -------------------------------", 3)
+    LcdDisplay("-----------", 4)
+    msleep(2000)
+    LcdCursor(true, false)
+    msleep(2000)
+    LcdCursor(true, true)
+    while true do
+        msleep(1000)
+        LcdOn(false)
+        msleep(1000)
+        LcdOn(true)
+    end
 end
 
 if ... then
