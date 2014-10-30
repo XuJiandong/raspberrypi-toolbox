@@ -16,7 +16,7 @@ extern void clean_i2c(void);
 extern void i2c_set_addr(int n);
 extern int i2c_get_file(void);
 extern void i2c_write_byte(uint8_t);
-
+extern uint8_t i2c_read_byte(void);
 
 extern void bmp180_init(void);
 extern int bmp180_get_t(void);
@@ -64,6 +64,28 @@ function testI2c(...)
     rt.i2c_set_addr(0x27)
     print("write " .. tostring(v) .. " to 0x27 on i2c")
     rt.i2c_write_byte(v)
+end
+
+function testI2cAdc(...)
+    local argv = {...}
+    local addr 
+    if argv[2] then
+        addr = tonumber(argv[2])
+    else
+        print("specify address")
+        return
+    end
+    print("address is %d" .. tostring(addr))
+    rt.init_i2c(1)
+    rt.i2c_set_addr(addr)
+    while true do
+        -- 0: 电位器 1: 光敏 2: 热敏 3: input
+        rt.i2c_write_byte(1)
+        local value = rt.i2c_read_byte() -- previous measurement, discard
+        value = rt.i2c_read_byte()
+        print("reading value :" .. tostring(value))
+        msleep(2000)
+    end
 end
 
 
@@ -145,6 +167,19 @@ function LcdOutput(...)
     end
 end
 
+function LcdReadStdin()
+    local buff = {}
+    for line in io.lines() do
+        table.insert(buff, line)
+        if #buff > 4 then
+            table.remove(buff, 1)
+        end
+        LcdOutput(unpack(buff))
+        -- delay
+        msleep(1000)
+    end
+end
+
 function testLcd1602(...)
     rt.lcd_init()
     rt.lcd_clear()
@@ -176,7 +211,7 @@ function testLcd1602(...)
 end
 
 function usage()
-    print("sudo bash run.sh [lcdtest|lcd]")
+    print("sudo bash run.sh [lcdtest|lcd|adctest]")
     return 1
 end
 
@@ -185,8 +220,9 @@ if ... then
     if args[1] == "lcdtest" then
         testLcd1602(...)
     elseif args[1] == "lcd" then
-        table.remove(args, 1)
-        LcdOutput(unpack(args))
+        LcdReadStdin()
+    elseif args[1] == "adctest" then
+        testI2cAdc(...)
     else
         return usage()
     end

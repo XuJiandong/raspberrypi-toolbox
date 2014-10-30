@@ -93,7 +93,7 @@ void lcd_init(void) {
     lcd_write_cmd(0x03);
     lcd_write_cmd(0x02);
 
-    lcd_write_cmd(LCD_FUNCTIONSET | LCD_2LINE | LCD_5x10DOTS | LCD_4BITMODE);
+    lcd_write_cmd(LCD_FUNCTIONSET | LCD_2LINE | LCD_5x8DOTS | LCD_4BITMODE);
     lcd_write_cmd(LCD_DISPLAYCONTROL | LCD_DISPLAYON);
     lcd_write_cmd(LCD_CLEARDISPLAY);
     usleep(1520);
